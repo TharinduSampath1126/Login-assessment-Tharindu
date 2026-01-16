@@ -7,6 +7,7 @@ const Login = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -19,6 +20,7 @@ const Login = () => {
   const handleGoogleSuccess = async (credentialResponse) => {
     setLoading(true);
     setError(null);
+    setSuccess(false);
     
     try {
       const res = await fetch('http://localhost:5000/auth/google', {
@@ -34,6 +36,8 @@ const Login = () => {
       setUser(userProfile);
       localStorage.setItem('authToken', userData.token);
       localStorage.setItem('userData', JSON.stringify(userProfile));
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -50,6 +54,7 @@ const Login = () => {
     
     setLoading(true);
     setError(null);
+    setSuccess(false);
     
     try {
       const res = await fetch('http://localhost:5000/auth/github', {
@@ -71,6 +76,8 @@ const Login = () => {
       setUser(userProfile);
       localStorage.setItem('authToken', userData.token);
       localStorage.setItem('userData', JSON.stringify(userProfile));
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -96,11 +103,13 @@ const Login = () => {
     return (
       <div className="login-container">
         <div className="login-box">
+          {success && <div className="success-message">Thank you for logging in!</div>}
           <div className="user-profile">
             <img src={user.picture} alt={user.name} className="profile-picture" />
             <h2>{user.name}</h2>
             {user.username && <p className="user-username">@{user.username}</p>}
             <p className="user-email">{user.email}</p>
+            <p className="user-provider">Logged in with {user.provider}</p>
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>
